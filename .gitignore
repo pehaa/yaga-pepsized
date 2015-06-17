@@ -1,0 +1,9 @@
+*.rb
+*.scssc
+config.codekit
+*.zip
+.sass-cache
+node_modules
+.npm-debug.log
+tmp
+.DS_Store
