@@ -2,4 +2,17 @@
 
 /* DO NOT use "@import". Just type some css that you need to add or override. */
 
-/* Good luck with your project! */ 
+/* Good luck with your project! */
+
+.media__img.avatar {
+	margin-left:0;
+}
+.media__img > img {
+	margin-right:0;
+}
+
+.yaga_widget_pehaa_authors img {
+	border:1px solid #eee;
+	padding:5px;
+	border-radius:0;
+}
