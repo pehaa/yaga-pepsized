@@ -139,3 +139,86 @@ function pepsized_widgets() {
 	
 }
 
+add_filter( 'phtpb_config_data', 'pepsized_phtpb_config_data' );
+
+function pepsized_phtpb_config_data( $data ) {
+
+	$use_color_item = array(
+		'title' => esc_html__( 'Use custom text color', 'yaga' ),
+		'type' => 'checkbox',
+		'default' => '',
+	);
+	$color_item = array(
+		'title' => esc_html__( 'Text Color', 'yaga' ),
+		'type' => 'color',
+		'default' => '#303030',
+	);
+
+	$data['phtpb_pepsized_donate_btn'] = array(
+		'label' => 'phtpb_pepsized_donate_btn',
+		'title' => esc_html__( 'Donate Button', 'yaga' ),
+		'phtpb_admin_type' => 'module',
+		'icon' => 'fa fa-dollar',
+		'phtpb_admin_mode' => 'simple',
+		'fields' => array(
+			'title' => array(
+				'title' => esc_html__( 'Button Text', 'yaga' ),
+				'type' => 'text',
+			),
+			'icon' => array(
+				'title' => esc_html__( 'Icon', 'yaga' ),
+				'type' => 'icons',
+			),
+			'use_color' => $use_color_item,
+			'color' => $color_item,
+			'border_radius' => array(
+				'title' => esc_html__( 'Rounded corners', 'yaga' ),
+				'type' => 'select',
+				'options' => array(
+					'none' => esc_html__( 'No rounded corners', 'yaga' ),
+					'2' => esc_html__( '2px - very subtle', 'yaga' ),
+					'3' => esc_html__( '3px - subtle', 'yaga' ),
+					'5' => esc_html__( '5px', 'yaga' ),
+					'10' => esc_html__( '10px', 'yaga' ),
+				),
+				'default' => 'none',
+			),
+		),
+		'create_with_settings' => true,
+		'add_submodule' => esc_html__( 'Add Button', 'yaga' ),
+	);
+
+	return $data;
+
+}
+
+add_action( 'yaga_addons_class_loaded', 'yaga_addons_class_loaded' );
+
+function yaga_addons_class_loaded(){
+	
+	add_filter( 'yaga_phtpb_shortcode_template', 'yaga_child_phtpb_shortcode_template', 10, 2 );
+	
+	class Yaga_Child_PeHaa_Themes_Page_Builder_Shortcode_Template extends Yaga_PeHaa_Themes_Page_Builder_Shortcode_Template {
+
+	protected function phtpb_pepsized_donate_btn() {
+
+		
+
+		$return = '<form class="paypal pht-mb0" action="https://www.paypal.com/cgi-bin/webscr" method="post">';
+		$return .= '<input type="hidden" name="lc" value="GB">';
+		$return .= '<input type="hidden" name="cmd" value="_s-xclick">';
+		$return .= '<input type="hidden" name="hosted_button_id" value="8TV4HQTEQTMLW">';	
+		$return .= '<button type="submit" class="pht-btn pht-btn__pb  pht-mb0 u-1-of-1-desk u-1-of-1-lap pht-rounded--' . $this->select_attribute( 'border_radius' ) . '" target="_self" name="submit">';
+		$return .= $this->icon_string;
+		$return .= '<span class="pht-btn__text" data-pht-tcontent="' . $this->title . '"><span class="pht-btn__textin">' . $this->title . '</span></span>';
+		$return .= '</button>';
+		$return .= '<img class="pht-mb0" alt="" border="0" src="https://www.paypalobjects.com/fr_FR/i/scr/pixel.gif" width="1" height="1">';
+		$return .= '</form>';
+		return $this->container( $return, 'phtpb_item pht-btn__container pht-btn__container-center pht-text-center' );
+	}
+}
+}
+
+function yaga_child_phtpb_shortcode_template( $content, $name ) {
+	return new Yaga_Child_PeHaa_Themes_Page_Builder_Shortcode_Template( $name );
+}

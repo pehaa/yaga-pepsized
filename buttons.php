@@ -43,13 +43,14 @@ if ( $download_url && $demo_button > 0 ) { ?>
 if ( $donate ) { ?>
 	<form class="paypal pht-mb0" action="https://www.paypal.com/cgi-bin/webscr" method="post">
 		<input type="hidden" name="lc" value="GB">
-		<input type="hidden" name="cmd" value="_s-xclick">	
-		<div class="phtpb_item pht-btn__container pht-btn__container-center pht-text-center phtpb_width--1plus phtpb_width--075plus phtpb_width--value10">
-		<button type="submit" class="pht-btn pht-btn__pb  pht-mb0 u-1-of-1-desk u-1-of-1-lap pht-rounded--none" target="_self" name="submit">
-			<i class="pht-btn__icon pht-ic-f1-cup"></i>
-			<span class="pht-btn__text" data-pht-tcontent="Buy me a coffee. Thanks!"><span class="pht-btn__textin">Buy me a coffee. Thanks!</span></span>
-		</button>
-		<img class="pht-mb0" alt="" border="0" src="https://www.paypalobjects.com/fr_FR/i/scr/pixel.gif" width="1" height="1">
+		<input type="hidden" name="cmd" value="_s-xclick">
+		<input type="hidden" name="hosted_button_id" value="8TV4HQTEQTMLW">
+		<div class="phtpb_item pht-btn__container pht-btn__container-center pht-text-center phtpb_width--1plus phtpb_width--075plus phtpb_width--value10">	
+			<button type="submit" class="pht-btn pht-btn__pb  pht-mb0 u-1-of-1-desk u-1-of-1-lap pht-rounded--none" target="_self" name="submit">
+				<i class="pht-btn__icon pht-ic-f1-cup"></i>
+				<span class="pht-btn__text" data-pht-tcontent="Buy me a coffee. Thanks!"><span class="pht-btn__textin">Buy me a coffee. Thanks!</span></span>
+			</button>
+			<img class="pht-mb0" alt="" border="0" src="https://www.paypalobjects.com/fr_FR/i/scr/pixel.gif" width="1" height="1">
 		</div>
 	</form>
 <?php }
