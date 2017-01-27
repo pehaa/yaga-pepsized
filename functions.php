@@ -26,7 +26,7 @@ function pepsized_excerpt( $excerpt ) {
 	$custom_excerpt = get_post_meta( $post->ID, 'ph_custom_excerpt', true );
 
 	if ( $custom_excerpt ) {
-		return "$custom_excerpt <br /><a class='excerpt' href='". get_permalink( $post->ID ) . "' title='Read more: " . esc_attr( get_the_title( $post->ID ) )."'>Read more &raquo;</a>";
+		return $custom_excerpt;
 	}
 
 	return $excerpt;
@@ -55,88 +55,20 @@ function pepsized_post_custom_css() {
 	}
 }
 
-//add_action( 'save_post', 'pepsized_maybe_generate_demo', 11, 3 );
-
-function pepsized_maybe_generate_demo( $post_id, $post ) {
-
-	if ( ! $post ) {
-		return;
-	}
-	if ( !isset( $_POST['nonce_CMB2phpph_pepsized_settings'] ) ) {
-		return;
-	}
-	if ( ! wp_verify_nonce( $_POST['nonce_CMB2phpph_pepsized_settings'], 'nonce_CMB2phpph_pepsized_settings' ) ) {
-		return;
-	}
-
-	$demo_link = trim( get_post_meta( $post_id, 'ph_demo_link', true ) );
-	$demo_id = get_post_meta( $post_id, 'ph_demo_id', true );
-
-
-	if ( ! $demo_link ) {
-		update_post_meta( $post_id, 'ph_demo_id', '-1' );
-		if ( $post_id === (int) get_post_meta( $demo_id, 'ph_demo_post_id', true ) ) {
-			wp_delete_post( $demo_id, true );					
-		}
-		return;
-	}
-
-	// $demo_link is set
-
-	if ( (int) $demo_id > 0 ) {
-		return;
-	}
-
-	$demo_id = wp_insert_post(
-		array(
-			'post_title'		=>	$post->post_title . ' - Demo',
-			'post_status'		=>	'publish',
-			'post_type'		=>	'pepsized_demo'
-		)
-	);
-
-	if ( $demo_id ) {
-		update_post_meta( $post_id, 'ph_demo_id', $demo_id );
-		update_post_meta( $demo_id, 'ph_demo_post_id', $post_id );
-	}
-
-}
-
-//add_action( 'wp_enqueue_scripts', 'pepsized_demo_css', 11 );
-
-function pepsized_demo_css() {
-	
-	if ( is_singular( 'pepsized_demo' ) ) {
-		$deps = apply_filters( 'pehaathemes_load_stylesheet_css', true ) ? 'pehaathemes-s-style' : 'pehaathemes-t-style';
-		wp_enqueue_style( 'pepsized-demo-css', get_stylesheet_directory_uri() . '/css/demo.css', $deps );		
-	}
-}
-
-//add_filter( 'pepsized_demo' . '_phtspt_post_type_args', 'pepsized_demo_args', 10, 3 );
-
-function pepsized_demo_args( $args, $key, $array ) {
-	
-	$args['show_ui'] = false;
-	$args['rewrite']['slug'] = 'demo';
-	$args['has_archive'] = false;
-	return $args;
-
-}
 
 add_action( 'yaga_just_before_the_content', 'pepsized_post_buttons' );
 function pepsized_post_buttons() {
+	if ( PeHaaThemes_Theme_Config::$use_phtpb ) {
+		return;
+	}
 	get_template_part( 'buttons' );
 }
-add_action( 'widgets_init', 'pepsized_widgets', 11 );
-/**
- * Recent_Posts with thumbnailswidget class
- *
- */
 
+
+add_action( 'widgets_init', 'pepsized_widgets', 11 );
 function pepsized_widgets() {
 	require_once get_stylesheet_directory().'/includes/class-pehaa-our-authors.php';
-	register_widget( 'Yaga_Widget_Our_Authors' );
-	
+	register_widget( 'Yaga_Widget_Our_Authors' );	
 }
 
 add_filter( 'phtpb_config_data', 'pepsized_phtpb_config_data' );
@@ -188,35 +120,56 @@ function pepsized_phtpb_config_data( $data ) {
 		'add_submodule' => esc_html__( 'Add Button', 'yaga' ),
 	);
 
+	$data['phtpb_pepsized_twitter_btn'] = array(
+		'label' => 'phtpb_pepsized_twitter_btn',
+		'title' => esc_html__( 'Tweet Button', 'yaga' ),
+		'phtpb_admin_type' => 'module',
+		'icon' => 'fa fa-twitter',
+		'phtpb_admin_mode' => 'simple',
+		'fields' => array(
+		),
+		'create_with_settings' => false,
+		'add_submodule' => esc_html__( 'Add Button', 'yaga' ),
+	);
+
 	return $data;
 
 }
 
 add_action( 'yaga_addons_class_loaded', 'yaga_addons_class_loaded' );
 
-function yaga_addons_class_loaded(){
+function yaga_addons_class_loaded() {
 	
 	add_filter( 'yaga_phtpb_shortcode_template', 'yaga_child_phtpb_shortcode_template', 10, 2 );
 	
 	class Yaga_Child_PeHaa_Themes_Page_Builder_Shortcode_Template extends Yaga_PeHaa_Themes_Page_Builder_Shortcode_Template {
 
-	protected function phtpb_pepsized_donate_btn() {
+		protected function phtpb_pepsized_donate_btn() {
 
-		
+			$return = '<form class="paypal pht-mb0" action="https://www.paypal.com/cgi-bin/webscr" method="post">';
+			$return .= '<input type="hidden" name="lc" value="GB">';
+			$return .= '<input type="hidden" name="cmd" value="_s-xclick">';
+			$return .= '<input type="hidden" name="hosted_button_id" value="8TV4HQTEQTMLW">';	
+			$return .= '<button type="submit" class="pht-btn pht-btn__pb  pht-mb0 u-1-of-1-desk u-1-of-1-lap pht-rounded--' . $this->select_attribute( 'border_radius' ) . '" target="_self" name="submit">';
+			$return .= $this->icon_string;
+			$return .= '<span class="pht-btn__text" data-pht-tcontent="' . $this->title . '"><span class="pht-btn__textin">' . $this->title . '</span></span>';
+			$return .= '</button>';
+			$return .= '<img class="pht-mb0" alt="" border="0" src="https://www.paypalobjects.com/fr_FR/i/scr/pixel.gif" width="1" height="1">';
+			$return .= '</form>';
+			return $this->container( $return, 'phtpb_item pht-btn__container pht-btn__container-center pht-text-center' );
+		}
 
-		$return = '<form class="paypal pht-mb0" action="https://www.paypal.com/cgi-bin/webscr" method="post">';
-		$return .= '<input type="hidden" name="lc" value="GB">';
-		$return .= '<input type="hidden" name="cmd" value="_s-xclick">';
-		$return .= '<input type="hidden" name="hosted_button_id" value="8TV4HQTEQTMLW">';	
-		$return .= '<button type="submit" class="pht-btn pht-btn__pb  pht-mb0 u-1-of-1-desk u-1-of-1-lap pht-rounded--' . $this->select_attribute( 'border_radius' ) . '" target="_self" name="submit">';
-		$return .= $this->icon_string;
-		$return .= '<span class="pht-btn__text" data-pht-tcontent="' . $this->title . '"><span class="pht-btn__textin">' . $this->title . '</span></span>';
-		$return .= '</button>';
-		$return .= '<img class="pht-mb0" alt="" border="0" src="https://www.paypalobjects.com/fr_FR/i/scr/pixel.gif" width="1" height="1">';
-		$return .= '</form>';
-		return $this->container( $return, 'phtpb_item pht-btn__container pht-btn__container-center pht-text-center' );
+		protected function phtpb_pepsized_twitter_btn() {
+
+			$post_id = PeHaaThemes_Theme_Config::$id;
+
+			$link = 'https://twitter.com/share?text=' . rawurlencode( html_entity_decode( get_the_title( $post_id ), ENT_COMPAT, 'UTF-8' ) ) . '&url=' . rawurlencode( get_the_permalink( $post_id ) ) . '&via=pepsized';
+
+			$shortcode = '[phtpb_btn admin_label="Tweet this!" title="Tweet this!" icon="pht-ic-f1-twitter" link="' . esc_url( $link ) . '" use_color="yes" color="#55acee" skip="yes"][/phtpb_btn]';
+			$return = do_shortcode( $shortcode );
+			return $this->container( $return, 'phtpb_item phtpb_buttons pht-mb' );
+		}
 	}
-}
 }
 
 function yaga_child_phtpb_shortcode_template( $content, $name ) {

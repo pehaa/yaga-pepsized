@@ -16,3 +16,25 @@
 	padding:5px;
 	border-radius:0;
 }
+
+.comment-form .form-submit {
+	text-align: right;
+}
+
+div.wpcf7 img.ajax-loader {
+	display:block;
+}
+
+pre[class*="language-"] {
+	margin-bottom:1.5rem!important;
+}
+:not(pre) > code[class*="language-"], pre[class*="language-"] {
+    background: #f6f6f6!important;
+}
+
+@media screen and (min-width: 1024px) {
+	.post-navigation--sticky .prev-link, .post-navigation--sticky .next-link {
+    	top: 272px;
+    	margin-top: 0;
+	}
+}

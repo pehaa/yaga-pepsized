@@ -8,10 +8,9 @@ class Pepsized_Demo {
 
 	private $settings = array();
 
-	public function __construct() {
+	public function __construct() {	
 		
-		
-		add_filter( $this->demo_post_type_slug . '_phtspt_post_type_args', array( $this, 'pepsized_demo_args' ), 10 );
+		add_filter( $this->demo_post_type_slug . '_pehaathemes_spt_post_type_args', array( $this, 'pepsized_demo_args' ), 10 );
 		add_action( 'save_post', array( $this, 'maybe_generate_demo' ), 11, 2 );
 		add_action( 'wp_enqueue_scripts', array( $this, 'demo_css' ), 11 );
 	
@@ -24,14 +23,14 @@ class Pepsized_Demo {
 
 	private function change_default_settings() {
 
-		//$this->remove_from_dashboard();
+		$this->remove_from_dashboard();
 		$this->rewrite_slug();
 		$this->disable_archive();
 
 	}
 
 	private function remove_from_dashboard() {
-		$this->settings['show_ui'] = false;
+		//$this->settings['show_ui'] = false;
 	}
 	private function rewrite_slug() {
 		$this->settings['rewrite']['slug'] = $this->demo_slug;
@@ -54,28 +53,31 @@ class Pepsized_Demo {
 			return;
 		}
 
-		$demo_link = trim( get_post_meta( $post_id, 'ph_demo_link', true ) );
-		$demo_id = get_post_meta( $post_id, 'ph_demo_id', true );
-
-		
-
-		if ( ! $demo_link ) {
-			update_post_meta( $post_id, 'ph_demo_id', '-1' );
-			if ( $post_id === (int) get_post_meta( $demo_id, 'ph_demo_post_id', true ) ) {
-				wp_delete_post( $demo_id, true );					
-			}
+		if ( 'inherit' === get_post_status( $post_id ) ) {
 			return;
 		}
 
+		$demo_link = trim( get_post_meta( $post_id, 'ph_demo_link', true ) );
+	
+		$demo_id = get_post_meta( $post_id, 'ph_demo_id', true );	
 
+
+		if ( ! $demo_link ) {
+			
+			update_post_meta( $post_id, 'ph_demo_id', '-1' );
+			
+			if ( $post_id === (int) get_post_meta( $demo_id, 'ph_demo_post_id', true ) ) {
+				wp_delete_post( $demo_id, true );					
+			}
+			
+			return;
+		}
 
 		// $demo_link is set
 
 		if ( get_post_status( $demo_id ) && ( (int) $demo_id ) > 0 ) {
 			return;
 		}
-
-
 
 		$demo_id = wp_insert_post(
 			array(
